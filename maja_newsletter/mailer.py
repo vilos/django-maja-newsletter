@@ -25,7 +25,7 @@ from html2text import html2text as html2text_orig
 
 from maja_newsletter.models import ContactMailingStatus
 from maja_newsletter.models import Newsletter
-from maja_newsletter.settings import INCLUDE_UNSUBSCRIPTION
+from maja_newsletter.settings import INCLUDE_UNSUBSCRIPTION, INCLUDE_SITE_LINK
 from maja_newsletter.settings import \
      RESTART_CONNECTION_BETWEEN_SENDING
 from maja_newsletter.settings import SLEEP_BETWEEN_SENDING
@@ -158,8 +158,9 @@ class NewsLetterSender(object):
 
         if TRACKING_LINKS:
             content = track_links(content, context)
-        link_site = render_to_string('newsletter/newsletter_link_site.html', context)
-        content = body_insertion(content, link_site)
+        if INCLUDE_SITE_LINK:
+            link_site = render_to_string('newsletter/newsletter_link_site.html', context)
+            content = body_insertion(content, link_site)
 
         if INCLUDE_UNSUBSCRIPTION:
             unsubscription = render_to_string('newsletter/newsletter_link_unsubscribe.html', context)
