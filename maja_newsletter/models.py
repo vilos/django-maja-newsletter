@@ -37,10 +37,10 @@ except AttributeError:
 
 
 class SendBatch(models.Model):
-    server = models.ForeignKey('SMTPServer')
+    server = models.ForeignKey('SMTPServer', on_delete=models.CASCADE)
     emails = models.IntegerField(_(u'emails batch'))
     date_create = models.DateTimeField(_(u'add date'), auto_now_add=True)
-    user = models.ForeignKey(User, verbose_name=_(u'operator'), null=True)
+    user = models.ForeignKey(User, verbose_name=_(u'operator'), null=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('email batch')
@@ -140,7 +140,7 @@ class Contact(models.Model):
     tester = models.BooleanField(_('contact tester'), default=False)
     tags = TagField(_('tags'))
 
-    content_type = models.ForeignKey(ContentType, blank=True, null=True)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, on_delete=models.PROTECT)
     object_id = models.PositiveIntegerField(blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -250,12 +250,12 @@ class Newsletter(models.Model):
     content = models.TextField(_('content'), help_text=_('Or paste an URL.'),
                                default=_('<body>\n<!-- Edit your newsletter here -->\n</body>'))
 
-    mailing_list = models.ForeignKey(MailingList, verbose_name=_('mailing list'))
+    mailing_list = models.ForeignKey(MailingList, verbose_name=_('mailing list'), on_delete=models.PROTECT)
     test_contacts = models.ManyToManyField(Contact, verbose_name=_('test contacts'),
                                            blank=True)
 
     server = models.ForeignKey(SMTPServer, verbose_name=_('smtp server'),
-                               default=1)
+                               default=1, on_delete=models.PROTECT)
     header_sender = models.CharField(_('sender'), max_length=255,
                                      default=DEFAULT_HEADER_SENDER)
     header_reply = models.CharField(_('reply to'), max_length=255,
@@ -323,7 +323,7 @@ def get_newsletter_storage_path(self, filename):
 class Attachment(models.Model):
     """Attachment file in a newsletter"""
 
-    newsletter = models.ForeignKey(Newsletter, verbose_name=_('newsletter'))
+    newsletter = models.ForeignKey(Newsletter, verbose_name=_('newsletter'), on_delete=models.CASCADE)
     title = models.CharField(_('title'), max_length=255)
     file_attachment = models.FileField(_('file to attach'), max_length=255,
                                        upload_to=get_newsletter_storage_path)
@@ -361,11 +361,11 @@ class ContactMailingStatus(models.Model):
                       (UNSUBSCRIPTION, _('unsubscription')),
                       )
 
-    newsletter = models.ForeignKey(Newsletter, verbose_name=_('newsletter'))
-    contact = models.ForeignKey(Contact, verbose_name=_('contact'))
+    newsletter = models.ForeignKey(Newsletter, verbose_name=_('newsletter'), on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contact, verbose_name=_('contact'), on_delete=models.CASCADE)
     status = models.IntegerField(_('status'), choices=STATUS_CHOICES)
     link = models.ForeignKey(Link, verbose_name=_('link'),
-                             blank=True, null=True)
+                             blank=True, null=True, on_delete=models.SET_NULL)
 
     creation_date = models.DateTimeField(_('creation date'), auto_now_add=True)
 
@@ -384,7 +384,7 @@ class ContactMailingStatus(models.Model):
 class WorkGroup(models.Model):
     """Work Group for privatization of the ressources"""
     name = models.CharField(_('name'), max_length=255)
-    group = models.ForeignKey(Group, verbose_name=_('permissions group'))
+    group = models.ForeignKey(Group, verbose_name=_('permissions group'),on_delete=models.PROTECT)
 
     contacts = models.ManyToManyField(Contact, verbose_name=_('contacts'), blank=True)
     mailinglists = models.ManyToManyField(MailingList, verbose_name=_('mailing lists'), blank=True)
