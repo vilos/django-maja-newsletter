@@ -1,7 +1,6 @@
 from django.conf.urls import url
-from django.conf.urls import patterns
+from maja_newsletter.views import tinymce_utils
 
-
-urlpatterns = patterns('maja_newsletter.views.tinymce_utils',
-    url(r'^templates/$', 'view_tinymce_templates', name='tinymce_templates_list'),
-)
+urlpatterns = [
+    url(r'^templates/$', tinymce_utils.view_tinymce_templates, name='tinymce_templates_list'),
+]
