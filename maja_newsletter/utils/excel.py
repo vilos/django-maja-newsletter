@@ -4,7 +4,6 @@ import datetime
 import pytz
 
 from django.conf import settings
-from maja_newsletter.utils import DJANGO_1_7
 
 try:
     from django.db.models.query import QuerySet
@@ -24,14 +23,10 @@ class ExcelResponse(HttpResponse):
         import StringIO
         output = StringIO.StringIO()
         output, mimetype, file_ext = make_excel_content(data, output, headers, force_csv, encoding)
-        if DJANGO_1_7:
-            super(ExcelResponse, self).__init__(
-                content=output.getvalue(), mimetype=mimetype
-            )
-        else:
-            super(ExcelResponse, self).__init__(
-                content=output.getvalue(), content_type=mimetype
-            )
+
+        super(ExcelResponse, self).__init__(
+            content=output.getvalue(), content_type=mimetype
+        )
         self['Content-Disposition'] = 'attachment;filename="%s.%s"' % (
             output_name.replace('"', '\"'), file_ext
         )

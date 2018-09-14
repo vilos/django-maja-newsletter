@@ -17,7 +17,6 @@ from django.utils.translation import ugettext_lazy as _
 from maja_newsletter.models import MailingList
 from maja_newsletter.settings import USE_WORKGROUPS
 from maja_newsletter.tasks import export_excel, export_vcard
-from maja_newsletter.utils import DJANGO_1_7
 from maja_newsletter.utils.excel import ExcelResponse
 from maja_newsletter.utils.importation import import_dispatcher
 from maja_newsletter.utils.vcard import vcard_contacts_export_response
@@ -159,12 +158,9 @@ class ContactAdmin(admin.ModelAdmin):
                    'opts': opts,
                    'app_label': opts.app_label}
 
-        if DJANGO_1_7:
-            return render_to_response('newsletter/contact_import.html',
-                                      context, RequestContext(request))
-        else:
-            return render_to_response('newsletter/contact_import.html',
-                                      RequestContext(request, context))
+
+        return render_to_response('newsletter/contact_import.html',
+                                    RequestContext(request, context))
 
     def filtered_request_queryset(self, request):
         """Return queryset filtered by the admin list view"""
@@ -176,10 +172,8 @@ class ContactAdmin(admin.ModelAdmin):
                         self.list_select_related, self.list_per_page,
                         self.list_max_show_all, self.list_editable,
                         self)
-        if DJANGO_1_7:
-            return cl.get_query_set(request)
-        else:
-            return cl.get_queryset(request)
+
+        return cl.get_queryset(request)
 
     def creation_mailinglist(self, request):
         """Create a mailing list form the filtered contacts"""
