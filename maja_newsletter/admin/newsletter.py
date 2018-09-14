@@ -12,7 +12,6 @@ from maja_newsletter.models import Attachment
 from maja_newsletter.models import MailingList
 from maja_newsletter.mailer import Mailer
 from maja_newsletter.settings import USE_TINYMCE
-from maja_newsletter.settings import USE_CELERY
 from maja_newsletter.settings import USE_WORKGROUPS
 from maja_newsletter.settings import USE_CKEDITOR
 from maja_newsletter.utils import wrap_transaction
@@ -27,8 +26,6 @@ from maja_newsletter.utils.workgroups import request_workgroups
 from maja_newsletter.utils.workgroups import request_workgroups_contacts_pk
 from maja_newsletter.utils.workgroups import request_workgroups_newsletters_pk
 from maja_newsletter.utils.workgroups import request_workgroups_mailinglists_pk
-
-from ..tasks import celery_send_newsletter
 
 
 class AttachmentAdminInline(admin.TabularInline):
@@ -171,8 +168,7 @@ class BaseNewsletterAdmin(admin.ModelAdmin):
                 newsletter.server.emails_remains = newsletter.server.emails_remains - emails_to_send
                 newsletter.server.save()
                 newsletter.save()
-                if USE_CELERY:
-                    celery_send_newsletter.apply_async((newsletter.pk,), eta=newsletter.sending_date)
+
         if sent_all:
             messages.success(request, _('%s newletters are ready to send') % queryset.count())
         # self.message_user(request, message)

@@ -15,7 +15,6 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from maja_newsletter.models import MailingList
-from maja_newsletter.settings import USE_CELERY
 from maja_newsletter.settings import USE_WORKGROUPS
 from maja_newsletter.tasks import export_excel, export_vcard
 from maja_newsletter.utils import DJANGO_1_7
@@ -85,11 +84,8 @@ class ContactAdmin(admin.ModelAdmin):
         if not export_name:
             export_name = 'contacts_edn_%s' % now().strftime('%d-%m-%Y')
         queryset = queryset.prefetch_related('content_object')
-        if USE_CELERY:
-            export_vcard.delay(queryset, request.user.email, export_name)
-            self.message_user(request, _(u'Export started, it will be sent by email soon'))
-        else:
-            return vcard_contacts_export_response(queryset)
+
+        return vcard_contacts_export_response(queryset)
     export_vcard.short_description = _('Export contacts as VCard')
 
     def export_excel(self, request, queryset, export_name=''):
@@ -97,11 +93,7 @@ class ContactAdmin(admin.ModelAdmin):
         if not export_name:
             export_name = 'contacts_edn_%s' % now().strftime('%d-%m-%Y')
         queryset = queryset.prefetch_related('content_object')
-        if USE_CELERY:
-            export_excel.delay(queryset, request.user.email, export_name)
-            self.message_user(request, _(u'Export started, it will be sent by email soon'))
-        else:
-            return ExcelResponse(queryset, export_name)
+        return ExcelResponse(queryset, export_name)
     export_excel.short_description = _('Export contacts in Excel')
 
     def disable_contacts(self, request, queryset):

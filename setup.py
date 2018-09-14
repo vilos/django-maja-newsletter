@@ -40,5 +40,4 @@ setup(name='django-maja-newsletter',
           'django-filebrowser-no-grappelli-nph',
           'premailer',
           'pytz',
-          'celery>=3.1,<3.2'
       ])
